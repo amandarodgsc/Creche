@@ -16,7 +16,7 @@ const Welcome = ({ navigation }) => {
             <View style={{ flex: 1 }}>
                 <View>
                     <Image
-                        source={require("../assets/hero1.jpg")}
+                        source={require("../assets/hero2.jpg")}
                         style={{
                             height: 100,
                             width: 100,

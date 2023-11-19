@@ -9,7 +9,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconButton } from 'react-native-paper';
 
 
-const Signup = ({ navigation }) => {
+const Medicacao = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
     const [formData, setFormData] = useState({
@@ -35,10 +35,10 @@ const Signup = ({ navigation }) => {
     };
     
 
-    const handleSignup = async () => {
+    const handleLogin = async () => {
         try {
             if (!validateEmail(formData.emailAddress)) {
-                throw new Error('Por favor, insira um email válido.');
+                throw new Error('Por favor, insira todos as informações.');
             }
             // Validação dos campos obrigatórios
             if (
@@ -131,7 +131,7 @@ const Signup = ({ navigation }) => {
                             marginVertical: 12,
                             color: COLORS.black
                         }}>
-                            Cadastro do responsável
+                            Cadastro Nutricional
                         </Text>
 
                         <Text style={{
@@ -145,7 +145,7 @@ const Signup = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Nome do responsável</Text>
+                        }}>Nome da Criança</Text>
 
                         <View style={{
                             width: "100%",
@@ -158,7 +158,7 @@ const Signup = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite o nome do responsável'
+                                placeholder='Digite o nome da criança'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='default'
                                 style={{ width: "100%" }}
@@ -174,7 +174,7 @@ const Signup = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Endereço do responsável</Text>
+                        }}>Idade da criança</Text>
 
                         <View style={{
                             width: "100%",
@@ -187,10 +187,13 @@ const Signup = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite o endereço do responsável'
+                                placeholder='Digite a idade'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{ width: "100%" }}
+                                keyboardType='numeric'
+                                style={{
+                                    width: "100%",
+                                    borderLeftColor: COLORS.grey,
+                                    height: "100%"}}
                                 onChangeText={handleAddressChange}
                                 value={formData.responsibleAddress}
                             />
@@ -203,7 +206,7 @@ const Signup = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Endereco de Email</Text>
+                        }}>Cidade de nascimento</Text>
 
                         <View style={{
                             width: "100%",
@@ -216,7 +219,7 @@ const Signup = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite um e-mail valido'
+                                placeholder='Digite a cidade'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='email-address'
                                 style={{ width: "100%" }}
@@ -231,7 +234,7 @@ const Signup = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Numero de Telefone</Text>
+                        }}>Tipo sanguineo</Text>
 
                         <View style={{
                             width: "100%",
@@ -245,9 +248,9 @@ const Signup = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='+61'
+                                placeholder='+ - '
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
+                                keyboardType='default'
                                 style={{
                                     width: "12%",
                                     borderRightWidth: 1,
@@ -257,9 +260,9 @@ const Signup = ({ navigation }) => {
                             />
 
                             <TextInput
-                                placeholder='Coloque seu numero de Telefone'
+                                placeholder='Tipo sanguineo da criança'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
+                                keyboardType='defalut'
                                 style={{ width: "100%" }}
                                 onChangeText={handleMobileNumberChange}
                                 value={formData.mobileNumber} // Corrigido de formData.responsibleNumber para formData.mobileNumber
@@ -272,7 +275,7 @@ const Signup = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>CPF do responsavel</Text>
+                        }}>CPF</Text>
 
                         <View style={{
                             width: "100%",
@@ -285,7 +288,7 @@ const Signup = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Coloque seu CPF'
+                                placeholder='Coloque CPF da criança'
                                 placeholderTextColor={COLORS.black}
                                 secureTextEntry={isPasswordShown}
                                 style={{ width: "100%" }}
@@ -329,7 +332,7 @@ const Signup = ({ navigation }) => {
                     <Button
                         title="Cadastre"
                         filled
-                        onPress={handleSignup}
+                        onPress={handleLogin}
                         style={{
                             marginTop: 18,
                             marginBottom: 4,
@@ -351,7 +354,7 @@ const Signup = ({ navigation }) => {
                                 marginHorizontal: 10
                             }}
                         />
-                        <Text style={{ fontSize: 14 }}>Responsaveis cadastrados:</Text>
+                        <Text style={{ fontSize: 14 }}>Crianças cadastradas:</Text>
                         <View
                             style={{
                                 flex: 1,
@@ -417,14 +420,14 @@ const Signup = ({ navigation }) => {
 
                         <Text style={{ fontSize: 16, color: COLORS.black }}>Clique para ir para:</Text>
                         <Pressable
-                            onPress={() => navigation.navigate("Login")}
+                            onPress={() => navigation.navigate("Medicacao")}
                         >
                             <Text style={{
                                 fontSize: 16,
                                 color: COLORS.primary,
                                 fontWeight: "bold",
                                 marginLeft: 6
-                            }}>Cadastro da Criança</Text>
+                            }}>Cadastro de Nutrição</Text>
                         </Pressable>
                     </View>
                 </View>
@@ -434,4 +437,4 @@ const Signup = ({ navigation }) => {
     )
 }
 
-export default Signup
+export default Medicacao
