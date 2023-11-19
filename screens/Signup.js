@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, scrollViewRef } from 'react-native'
+import { View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, scrollViewRef, Image } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from '../constants/colors';
@@ -123,6 +123,22 @@ const Signup = ({ navigation }) => {
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps="handled"
             >
+                <View style={{ position: 'absolute', top: 10, left: 10 }}>
+        <Image
+          source={require("../assets/hero1.jpg")} // Substitua pelo caminho da sua primeira imagem
+          style={{
+            height: 100,
+            width: 100,
+            borderRadius: 20,
+            transform: [
+              { translateX: 285 },
+              { translateY: 0 },
+              { rotate: "1deg" }
+            ]
+          }}
+        />
+        {/* Adicione mais imagens seguindo o mesmo padrão... */}
+      </View>
                 <View style={{ flex: 1, marginHorizontal: 22 }}>
                     <View style={{ marginVertical: 22 }}>
                         <Text style={{
