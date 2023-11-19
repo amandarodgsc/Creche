@@ -1,4 +1,4 @@
-import { View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, scrollViewRef} from 'react-native'
+import { View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, scrollViewRef } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from "react-native-safe-area-context";
 import COLORS from '../constants/colors';
@@ -7,6 +7,7 @@ import Checkbox from "expo-checkbox"
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconButton } from 'react-native-paper';
+
 
 const Preferencias = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
@@ -32,18 +33,14 @@ const Preferencias = ({ navigation }) => {
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailPattern.test(email);
     };
-    
+
 
     const handleLogin = async () => {
         try {
-            if (!validateEmail(formData.emailAddress)) {
-                throw new Error('Por favor, insira todos as informações.');
-            }
             // Validação dos campos obrigatórios
             if (
                 !formData.responsibleName ||
                 !formData.responsibleAddress ||
-                !formData.emailAddress ||
                 !formData.mobileNumber ||
                 !formData.cpf
             ) {
@@ -62,7 +59,6 @@ const Preferencias = ({ navigation }) => {
             setFormData({
                 responsibleName: '',
                 responsibleAddress: '',
-                emailAddress: '',
                 mobileNumber: '',
                 cpf: ''
             });
@@ -130,8 +126,7 @@ const Preferencias = ({ navigation }) => {
                             marginVertical: 12,
                             color: COLORS.black
                         }}>
-                            Cadastro Nutricional
-                        </Text>
+                            Preferencia dos pais                      </Text>
 
                         <Text style={{
                             fontSize: 16,
@@ -144,7 +139,7 @@ const Preferencias = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Nome da Criança</Text>
+                        }}> Horario de entrada:</Text>
 
                         <View style={{
                             width: "100%",
@@ -157,7 +152,7 @@ const Preferencias = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite o nome da criança'
+                                placeholder='Digite a qual melhor horario de entrada'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='default'
                                 style={{ width: "100%" }}
@@ -173,7 +168,7 @@ const Preferencias = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Idade da criança</Text>
+                        }}>Horario de saida:</Text>
 
                         <View style={{
                             width: "100%",
@@ -186,13 +181,14 @@ const Preferencias = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a idade'
+                                placeholder='Melhor horario para buscar a criança'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
+                                keyboardType='default'
                                 style={{
                                     width: "100%",
                                     borderLeftColor: COLORS.grey,
-                                    height: "100%"}}
+                                    height: "100%"
+                                }}
                                 onChangeText={handleAddressChange}
                                 value={formData.responsibleAddress}
                             />
@@ -205,7 +201,7 @@ const Preferencias = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Cidade de nascimento</Text>
+                        }}>Horario para descanço:</Text>
 
                         <View style={{
                             width: "100%",
@@ -218,13 +214,13 @@ const Preferencias = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a cidade'
+                                placeholder='Quais horarios de soneca?'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='email-address'
                                 style={{ width: "100%" }}
                                 onChangeText={handleEmailChange}
                                 value={formData.emailAddress} // Corrigido de formData.responsibleEmailAdress para formData.emailAddress
-                                />
+                            />
                         </View>
                     </View>
 
@@ -233,7 +229,7 @@ const Preferencias = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Tipo sanguineo</Text>
+                        }}>Preferencia de Horario de alimentação</Text>
 
                         <View style={{
                             width: "100%",
@@ -246,26 +242,16 @@ const Preferencias = ({ navigation }) => {
                             justifyContent: "space-between",
                             paddingLeft: 22
                         }}>
-                            <TextInput
-                                placeholder='+ - '
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{
-                                    width: "12%",
-                                    borderRightWidth: 1,
-                                    borderLeftColor: COLORS.grey,
-                                    height: "100%"
-                                }}
-                            />
+
 
                             <TextInput
-                                placeholder='Tipo sanguineo da criança'
+                                placeholder='Preferencia de horarios de alimentação, lanches'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='defalut'
                                 style={{ width: "100%" }}
                                 onChangeText={handleMobileNumberChange}
                                 value={formData.mobileNumber} // Corrigido de formData.responsibleNumber para formData.mobileNumber
-                                />
+                            />
                         </View>
                     </View>
 
@@ -274,7 +260,7 @@ const Preferencias = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>CPF</Text>
+                        }}>Numero de cadastro da criança</Text>
 
                         <View style={{
                             width: "100%",
@@ -287,13 +273,13 @@ const Preferencias = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Coloque CPF da criança'
+                                placeholder='CPF cadastrado da criança'
                                 placeholderTextColor={COLORS.black}
                                 secureTextEntry={isPasswordShown}
                                 style={{ width: "100%" }}
                                 onChangeText={handleCPFChange}
                                 value={formData.cpf} // Corrigido de formData.responsiblecpf para formData.cpf
-                                />
+                            />
 
                             <TouchableOpacity
                                 onPress={() => setIsPasswordShown(!isPasswordShown)}
@@ -353,7 +339,7 @@ const Preferencias = ({ navigation }) => {
                                 marginHorizontal: 10
                             }}
                         />
-                        <Text style={{ fontSize: 14 }}>Crianças cadastradas:</Text>
+                        <Text style={{ fontSize: 14 }}>Preferencias:</Text>
                         <View
                             style={{
                                 flex: 1,
@@ -368,13 +354,13 @@ const Preferencias = ({ navigation }) => {
                     {submittedData.map((data, index) => (
                         <View key={index} style={{ marginTop: 20 }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-                                Responsável {index + 1}:
+                                Medicações e Informações {index + 1}:
                             </Text>
-                            <Text>Nome: {data.responsibleName}</Text>
-                            <Text>Endereço: {data.responsibleAddress}</Text>
-                            <Text>Email: {data.emailAddress}</Text>
-                            <Text>Número de Telefone: {data.mobileNumber}</Text>
-                            <Text>CPF: {data.cpf}</Text>
+                            <Text>Alergia a medicamento: {data.responsibleName}</Text>
+                            <Text>Remedio continuo: {data.responsibleAddress}</Text>
+                            <Text>Horarios de remedio: {data.emailAddress}</Text>
+                            <Text>Numero de emergencia: {data.mobileNumber}</Text>
+                            <Text>Numero carteirinha plano: {data.cpf}</Text>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={{ marginRight: 10 }}>
                                     <IconButton
@@ -400,7 +386,7 @@ const Preferencias = ({ navigation }) => {
                         </View>
                     ))}
 
-                    
+
 
                     <View style={{
                         flexDirection: 'row',
@@ -417,16 +403,7 @@ const Preferencias = ({ navigation }) => {
 
 
 
-                        <Text style={{ fontSize: 16, color: COLORS.black }}>Clique para ir para:</Text>
-                        <Pressable
-                        >
-                            <Text style={{
-                                fontSize: 16,
-                                color: COLORS.primary,
-                                fontWeight: "bold",
-                                marginLeft: 6
-                            }}>Cadastro de Nutrição</Text>
-                        </Pressable>
+
                     </View>
                 </View>
             </ScrollView>
@@ -435,4 +412,5 @@ const Preferencias = ({ navigation }) => {
     )
 }
 
-export default Preferencias; // Deixe apenas a exportação do componente Preferencias no final do arquivo
+export default Preferencias
+

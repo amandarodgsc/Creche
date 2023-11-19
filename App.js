@@ -15,12 +15,12 @@ export default function App() {
           tabBarIcon: ({ color, size }) => {
             let iconName;
 
-            if (route.name === 'Welcome') {
+            if (route.name === 'Home') {
               iconName = 'home';
-            } else if (route.name === 'Login') {
+            } else if (route.name === 'Crianca') {
               iconName = 'person';
-            } else if (route.name === 'Signup') {
-              iconName = 'add-circle';
+            } else if (route.name === 'Responsavel') {
+              iconName = 'person';
             } else if (route.name === 'Nutricao') {
               iconName = 'nutrition';
             } else if (route.name === 'Medicacao') {
@@ -37,9 +37,9 @@ export default function App() {
           inactiveTintColor: 'gray',
         }}
       >
-        <Tab.Screen name="Welcome" component={Welcome} />
-        <Tab.Screen name="Login" component={Login} />
-        <Tab.Screen name="Signup" component={Signup} />
+        <Tab.Screen name="Home" component={Welcome} />
+        <Tab.Screen name="Crianca" component={Login} />
+        <Tab.Screen name="Responsavel" component={Signup} />
         <Tab.Screen name="Nutricao" component={Nutricao} />
         <Tab.Screen name="Medicacao" component={Medicacao} />
         <Tab.Screen name="Preferencias" component={Preferencias} />

@@ -37,37 +37,32 @@ const Nutricao = ({ navigation }) => {
 
     const handleLogin = async () => {
         try {
-            if (!validateEmail(formData.emailAddress)) {
-                throw new Error('Por favor, insira todos as informações.');
-            }
             // Validação dos campos obrigatórios
             if (
                 !formData.responsibleName ||
                 !formData.responsibleAddress ||
-                !formData.emailAddress ||
                 !formData.mobileNumber ||
                 !formData.cpf
             ) {
                 throw new Error('Por favor, preencha todos os campos obrigatórios.');
             }
-
+    
             let newData = [...submittedData]; // Criando uma cópia dos dados submetidos
             newData.push(formData); // Adicionando o novo formulário aos dados submetidos
-
+    
             // Atualiza os dados submetidos e limpa o estado dos campos do formulário
             setSubmittedData(newData);
             setSaveError(null);
             await AsyncStorage.setItem('user_data', JSON.stringify(newData));
-
+    
             // Limpa os campos do formulário
             setFormData({
                 responsibleName: '',
                 responsibleAddress: '',
-                emailAddress: '',
                 mobileNumber: '',
                 cpf: ''
             });
-
+    
             // Navega para a próxima tela ou executa outra ação necessária
             // navigation.navigate("Login");
         } catch (error) {
@@ -75,7 +70,6 @@ const Nutricao = ({ navigation }) => {
             setSaveError(error.message || "Erro ao salvar os dados. Por favor, tente novamente.");
         }
     };
-
 
 
     const handleEdit = (index) => {
@@ -145,7 +139,7 @@ const Nutricao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Nome da Criança</Text>
+                        }}>Alergia a qual alimento?</Text>
 
                         <View style={{
                             width: "100%",
@@ -158,7 +152,7 @@ const Nutricao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite o nome da criança'
+                                placeholder='Digite o alimento'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='default'
                                 style={{ width: "100%" }}
@@ -174,7 +168,7 @@ const Nutricao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Idade da criança</Text>
+                        }}>Peso da criança</Text>
 
                         <View style={{
                             width: "100%",
@@ -187,7 +181,7 @@ const Nutricao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a idade'
+                                placeholder='Digite o KG'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='numeric'
                                 style={{
@@ -206,7 +200,7 @@ const Nutricao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Cidade de nascimento</Text>
+                        }}>Altura</Text>
 
                         <View style={{
                             width: "100%",
@@ -219,9 +213,9 @@ const Nutricao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a cidade'
+                                placeholder='Digite a altura'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='email-address'
+                                keyboardType='numeric'
                                 style={{ width: "100%" }}
                                 onChangeText={handleEmailChange}
                                 value={formData.emailAddress} // Corrigido de formData.responsibleEmailAdress para formData.emailAddress
@@ -234,7 +228,7 @@ const Nutricao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Tipo sanguineo</Text>
+                        }}>Alimentações por dia</Text>
 
                         <View style={{
                             width: "100%",
@@ -247,22 +241,11 @@ const Nutricao = ({ navigation }) => {
                             justifyContent: "space-between",
                             paddingLeft: 22
                         }}>
+                           
                             <TextInput
-                                placeholder='+ - '
+                                placeholder='Quantidade de alimentação diaria'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{
-                                    width: "12%",
-                                    borderRightWidth: 1,
-                                    borderLeftColor: COLORS.grey,
-                                    height: "100%"
-                                }}
-                            />
-
-                            <TextInput
-                                placeholder='Tipo sanguineo da criança'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='defalut'
+                                keyboardType='numeric'
                                 style={{ width: "100%" }}
                                 onChangeText={handleMobileNumberChange}
                                 value={formData.mobileNumber} // Corrigido de formData.responsibleNumber para formData.mobileNumber
@@ -275,7 +258,7 @@ const Nutricao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>CPF</Text>
+                        }}>Horarios de Alimentação</Text>
 
                         <View style={{
                             width: "100%",
@@ -288,30 +271,14 @@ const Nutricao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Coloque CPF da criança'
+                                placeholder='Digite os horarios'
                                 placeholderTextColor={COLORS.black}
-                                secureTextEntry={isPasswordShown}
                                 style={{ width: "100%" }}
                                 onChangeText={handleCPFChange}
                                 value={formData.cpf} // Corrigido de formData.responsiblecpf para formData.cpf
                                 />
 
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordShown(!isPasswordShown)}
-                                style={{
-                                    position: "absolute",
-                                    right: 12
-                                }}
-                            >
-                                {
-                                    isPasswordShown == true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.black} />
-                                    ) : (
-                                        <Ionicons name="eye" size={24} color={COLORS.black} />
-                                    )
-                                }
-
-                            </TouchableOpacity>
+                            
                         </View>
                     </View>
 
@@ -369,13 +336,13 @@ const Nutricao = ({ navigation }) => {
                     {submittedData.map((data, index) => (
                         <View key={index} style={{ marginTop: 20 }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-                                Responsável {index + 1}:
+                                Cadastro Nutricional {index + 1}:
                             </Text>
-                            <Text>Nome: {data.responsibleName}</Text>
-                            <Text>Endereço: {data.responsibleAddress}</Text>
-                            <Text>Email: {data.emailAddress}</Text>
-                            <Text>Número de Telefone: {data.mobileNumber}</Text>
-                            <Text>CPF: {data.cpf}</Text>
+                            <Text>Alergia a: {data.responsibleName}</Text>
+                            <Text>Peso da criança: {data.responsibleAddress}</Text>
+                            <Text>Altura: {data.emailAddress}</Text>
+                            <Text>Quantidade de refeições: {data.mobileNumber}</Text>
+                            <Text>Horarios das Refeiçoes: {data.cpf}</Text>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={{ marginRight: 10 }}>
                                     <IconButton
@@ -418,17 +385,7 @@ const Nutricao = ({ navigation }) => {
 
 
 
-                        <Text style={{ fontSize: 16, color: COLORS.black }}>Clique para ir para:</Text>
-                        <Pressable
-                            onPress={() => navigation.navigate("Nutricao")}
-                        >
-                            <Text style={{
-                                fontSize: 16,
-                                color: COLORS.primary,
-                                fontWeight: "bold",
-                                marginLeft: 6
-                            }}>Cadastro de Nutrição</Text>
-                        </Pressable>
+                        
                     </View>
                 </View>
             </ScrollView>

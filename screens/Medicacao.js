@@ -37,37 +37,32 @@ const Medicacao = ({ navigation }) => {
 
     const handleLogin = async () => {
         try {
-            if (!validateEmail(formData.emailAddress)) {
-                throw new Error('Por favor, insira todos as informações.');
-            }
             // Validação dos campos obrigatórios
             if (
                 !formData.responsibleName ||
                 !formData.responsibleAddress ||
-                !formData.emailAddress ||
                 !formData.mobileNumber ||
                 !formData.cpf
             ) {
                 throw new Error('Por favor, preencha todos os campos obrigatórios.');
             }
-
+    
             let newData = [...submittedData]; // Criando uma cópia dos dados submetidos
             newData.push(formData); // Adicionando o novo formulário aos dados submetidos
-
+    
             // Atualiza os dados submetidos e limpa o estado dos campos do formulário
             setSubmittedData(newData);
             setSaveError(null);
             await AsyncStorage.setItem('user_data', JSON.stringify(newData));
-
+    
             // Limpa os campos do formulário
             setFormData({
                 responsibleName: '',
                 responsibleAddress: '',
-                emailAddress: '',
                 mobileNumber: '',
                 cpf: ''
             });
-
+    
             // Navega para a próxima tela ou executa outra ação necessária
             // navigation.navigate("Login");
         } catch (error) {
@@ -131,8 +126,7 @@ const Medicacao = ({ navigation }) => {
                             marginVertical: 12,
                             color: COLORS.black
                         }}>
-                            Cadastro Nutricional
-                        </Text>
+Medicaçoes e informações                        </Text>
 
                         <Text style={{
                             fontSize: 16,
@@ -145,7 +139,7 @@ const Medicacao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Nome da Criança</Text>
+                        }}>Alergia a medicamento</Text>
 
                         <View style={{
                             width: "100%",
@@ -158,7 +152,7 @@ const Medicacao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite o nome da criança'
+                                placeholder='Digite a qual medicamento a criança é alergica'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='default'
                                 style={{ width: "100%" }}
@@ -174,7 +168,7 @@ const Medicacao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Idade da criança</Text>
+                        }}>Remedio de uso continuo</Text>
 
                         <View style={{
                             width: "100%",
@@ -187,9 +181,9 @@ const Medicacao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a idade'
+                                placeholder='Qual remedio é de uso continuo'
                                 placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
+                                keyboardType='default'
                                 style={{
                                     width: "100%",
                                     borderLeftColor: COLORS.grey,
@@ -206,7 +200,7 @@ const Medicacao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Cidade de nascimento</Text>
+                        }}>Horario do medicamento</Text>
 
                         <View style={{
                             width: "100%",
@@ -219,7 +213,7 @@ const Medicacao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Digite a cidade'
+                                placeholder='Quais horarios?'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='email-address'
                                 style={{ width: "100%" }}
@@ -234,7 +228,7 @@ const Medicacao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>Tipo sanguineo</Text>
+                        }}>Numero de emergencia</Text>
 
                         <View style={{
                             width: "100%",
@@ -247,20 +241,10 @@ const Medicacao = ({ navigation }) => {
                             justifyContent: "space-between",
                             paddingLeft: 22
                         }}>
-                            <TextInput
-                                placeholder='+ - '
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{
-                                    width: "12%",
-                                    borderRightWidth: 1,
-                                    borderLeftColor: COLORS.grey,
-                                    height: "100%"
-                                }}
-                            />
+                            
 
                             <TextInput
-                                placeholder='Tipo sanguineo da criança'
+                                placeholder='Numero de emergencia medica'
                                 placeholderTextColor={COLORS.black}
                                 keyboardType='defalut'
                                 style={{ width: "100%" }}
@@ -275,7 +259,7 @@ const Medicacao = ({ navigation }) => {
                             fontSize: 16,
                             fontWeight: 400,
                             marginVertical: 8
-                        }}>CPF</Text>
+                        }}>Numero Carteirinha convenio</Text>
 
                         <View style={{
                             width: "100%",
@@ -288,7 +272,7 @@ const Medicacao = ({ navigation }) => {
                             paddingLeft: 22
                         }}>
                             <TextInput
-                                placeholder='Coloque CPF da criança'
+                                placeholder='Coloque o numero da carteirinha'
                                 placeholderTextColor={COLORS.black}
                                 secureTextEntry={isPasswordShown}
                                 style={{ width: "100%" }}
@@ -354,7 +338,7 @@ const Medicacao = ({ navigation }) => {
                                 marginHorizontal: 10
                             }}
                         />
-                        <Text style={{ fontSize: 14 }}>Crianças cadastradas:</Text>
+                        <Text style={{ fontSize: 14 }}>Medicações e Informações:</Text>
                         <View
                             style={{
                                 flex: 1,
@@ -369,13 +353,13 @@ const Medicacao = ({ navigation }) => {
                     {submittedData.map((data, index) => (
                         <View key={index} style={{ marginTop: 20 }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-                                Responsável {index + 1}:
+                                Medicações e Informações {index + 1}:
                             </Text>
-                            <Text>Nome: {data.responsibleName}</Text>
-                            <Text>Endereço: {data.responsibleAddress}</Text>
-                            <Text>Email: {data.emailAddress}</Text>
-                            <Text>Número de Telefone: {data.mobileNumber}</Text>
-                            <Text>CPF: {data.cpf}</Text>
+                            <Text>Alergia a medicamento: {data.responsibleName}</Text>
+                            <Text>Remedio continuo: {data.responsibleAddress}</Text>
+                            <Text>Horarios de remedio: {data.emailAddress}</Text>
+                            <Text>Numero de emergencia: {data.mobileNumber}</Text>
+                            <Text>Numero carteirinha plano: {data.cpf}</Text>
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={{ marginRight: 10 }}>
                                     <IconButton
@@ -418,17 +402,7 @@ const Medicacao = ({ navigation }) => {
 
 
 
-                        <Text style={{ fontSize: 16, color: COLORS.black }}>Clique para ir para:</Text>
-                        <Pressable
-                            onPress={() => navigation.navigate("Medicacao")}
-                        >
-                            <Text style={{
-                                fontSize: 16,
-                                color: COLORS.primary,
-                                fontWeight: "bold",
-                                marginLeft: 6
-                            }}>Cadastro de Nutrição</Text>
-                        </Pressable>
+                       
                     </View>
                 </View>
             </ScrollView>

@@ -114,14 +114,7 @@ const Welcome = ({ navigation }) => {
                         }}>Tenha mais organização, no seu dia a dia.</Text>
                     </View>
 
-                    <Button
-                        title="Começe"
-                        onPress={() => navigation.navigate("Signup")}
-                        style={{
-                            marginTop: 22,
-                            width: "100%"
-                        }}
-                    />
+                    
 
                     <View style={{
                         flexDirection: "row",

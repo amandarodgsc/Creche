@@ -415,17 +415,7 @@ const Signup = ({ navigation }) => {
 
 
 
-                        <Text style={{ fontSize: 16, color: COLORS.black }}>Clique para ir para:</Text>
-                        <Pressable
-                            onPress={() => navigation.navigate("Login")}
-                        >
-                            <Text style={{
-                                fontSize: 16,
-                                color: COLORS.primary,
-                                fontWeight: "bold",
-                                marginLeft: 6
-                            }}>Cadastro da Criança</Text>
-                        </Pressable>
+                        
                     </View>
                 </View>
             </ScrollView>
