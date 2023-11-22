@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, ScrollView, Image, StyleSheet } from 'react-native';
+import { View, Text, ScrollView, Image, StyleSheet, TextInput } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -34,6 +34,11 @@ const Nutricao = ({ navigation }) => {
     altura: yup.string().required('Campo obrigatório'),
     alimentacoesPorDia: yup.string().required('Campo obrigatório'),
     horariosDeAlimentacao: yup.string().required('Campo obrigatório'),
+    alergiaMedicamento: yup.string().nullable(),
+    remedioContinuo: yup.string().nullable(),
+    horarioMedicamento: yup.string().nullable(),
+    numeroEmergencia: yup.string().matches(/^\d{10}$/, 'Número de emergência inválido').nullable(),
+    numeroCarteirinhaConvenio: yup.string().matches(/^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$/, 'Número de carteirinha inválido').nullable(),
   });
 
   const formik = useFormik({
@@ -42,6 +47,11 @@ const Nutricao = ({ navigation }) => {
       altura: '',
       alimentacoesPorDia: '',
       horariosDeAlimentacao: '',
+      alergiaMedicamento: '',
+      remedioContinuo: '',
+      horarioMedicamento: '',
+      numeroEmergencia: '',
+      numeroCarteirinhaConvenio: '',
     },
     validationSchema: validationSchema,
     onSubmit: handleNutricao,
@@ -49,7 +59,6 @@ const Nutricao = ({ navigation }) => {
 
   const handleNutricao = async () => {
     try {
-      // Clear touched fields
       setTouchedFields({});
 
       if (
@@ -63,12 +72,9 @@ const Nutricao = ({ navigation }) => {
 
       let newData = [...submittedData];
 
-      // Check if editing or adding
       if (editIndex !== -1) {
-        // Editing: replace existing data
         newData[editIndex] = formik.values;
       } else {
-        // Adding: add a new entry
         newData.push(formik.values);
       }
 
@@ -76,7 +82,6 @@ const Nutricao = ({ navigation }) => {
       setSaveError(null);
       await AsyncStorage.setItem('child_data', JSON.stringify(newData));
 
-      // Reset the form and edit index
       formik.resetForm();
       setEditIndex(-1);
     } catch (error) {
@@ -98,15 +103,18 @@ const Nutricao = ({ navigation }) => {
       return;
     }
 
-    // Update the form state with existing data
     formik.setValues({
       peso: editedData.peso || '',
       altura: editedData.altura || '',
       alimentacoesPorDia: editedData.alimentacoesPorDia || '',
       horariosDeAlimentacao: editedData.horariosDeAlimentacao || '',
+      alergiaMedicamento: editedData.alergiaMedicamento || '',
+      remedioContinuo: editedData.remedioContinuo || '',
+      horarioMedicamento: editedData.horarioMedicamento || '',
+      numeroEmergencia: editedData.numeroEmergencia || '',
+      numeroCarteirinhaConvenio: editedData.numeroCarteirinhaConvenio || '',
     });
 
-    // Set the edit index to the current index
     setEditIndex(index);
   };
 

@@ -7,6 +7,7 @@ import Checkbox from "expo-checkbox"
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconButton } from 'react-native-paper';
+import { TextInputMask } from 'react-native-masked-text'; // Importa a biblioteca
 
 
 const Medicacao = ({ navigation }) => {
@@ -35,57 +36,10 @@ const Medicacao = ({ navigation }) => {
     };
     
 
-    const handleLogin = async () => {
-        try {
-            // Validação dos campos obrigatórios
-            if (
-                !formData.responsibleName ||
-                !formData.responsibleAddress ||
-                !formData.mobileNumber ||
-                !formData.cpf
-            ) {
-                throw new Error('Por favor, preencha todos os campos obrigatórios.');
-            }
-    
-            let newData = [...submittedData]; // Criando uma cópia dos dados submetidos
-            newData.push(formData); // Adicionando o novo formulário aos dados submetidos
-    
-            // Atualiza os dados submetidos e limpa o estado dos campos do formulário
-            setSubmittedData(newData);
-            setSaveError(null);
-            await AsyncStorage.setItem('user_data', JSON.stringify(newData));
-    
-            // Limpa os campos do formulário
-            setFormData({
-                responsibleName: '',
-                responsibleAddress: '',
-                mobileNumber: '',
-                cpf: ''
-            });
-    
-            // Navega para a próxima tela ou executa outra ação necessária
-            // navigation.navigate("Login");
-        } catch (error) {
-            console.error("Error saving data: ", error);
-            setSaveError(error.message || "Erro ao salvar os dados. Por favor, tente novamente.");
-        }
-    };
-
-
-
     const handleEdit = (index) => {
         const editedData = submittedData[index];
 
-        if (
-            !editedData.responsibleName ||
-            !editedData.responsibleAddress ||
-            !editedData.emailAddress ||
-            !editedData.mobileNumber ||
-            !editedData.cpf
-        ) {
-            setSaveError('Por favor, preencha todos os campos obrigatórios.');
-            return;
-        }
+        // Preenche o estado formData com as informações do item selecionado
         setFormData({
             responsibleName: editedData.responsibleName || '',
             responsibleAddress: editedData.responsibleAddress || '',
@@ -93,12 +47,57 @@ const Medicacao = ({ navigation }) => {
             mobileNumber: editedData.mobileNumber || '',
             cpf: editedData.cpf || '',
         });
+
+        // Limpa o erro e atualiza o índice de edição
+        setSaveError(null);
         setEditIndex(index);
     };
 
+    // ...
 
+    const handleLogin = async () => {
+        try {
+            if (editIndex !== -1) {
+                // Se editIndex for diferente de -1, significa que estamos editando
+                // Atualiza o item existente no estado submittedData
+                const updatedData = [...submittedData];
+                updatedData[editIndex] = {
+                    responsibleName: formData.responsibleName || '',
+                    responsibleAddress: formData.responsibleAddress || '',
+                    emailAddress: formData.emailAddress || '',
+                    mobileNumber: formData.mobileNumber || '',
+                    cpf: formData.cpf || '',
+                };
 
+                setSubmittedData(updatedData);
+                setFormData({
+                    responsibleName: '',
+                    responsibleAddress: '',
+                    mobileNumber: '',
+                    cpf: '',
+                });
+                setEditIndex(-1);
+            } else {
+                // Caso contrário, estamos adicionando um novo conjunto de dados
+                let newData = [...submittedData];
+                newData.push(formData);
 
+                setSubmittedData(newData);
+                setFormData({
+                    responsibleName: '',
+                    responsibleAddress: '',
+                    mobileNumber: '',
+                    cpf: '',
+                });
+            }
+
+            setSaveError(null);
+            await AsyncStorage.setItem('user_data', JSON.stringify(submittedData));
+        } catch (error) {
+            console.error("Error saving data: ", error);
+            setSaveError(error.message || "Erro ao salvar os dados. Por favor, tente novamente.");
+        }
+    };
     const handleDelete = async (index) => {
         try {
             const newData = submittedData.filter((_, i) => i !== index);
@@ -212,106 +211,112 @@ Medicaçoes e informações                        </Text>
                     </View>
 
                     <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Horario do medicamento</Text>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Horario do medicamento</Text>
 
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Quais horarios?'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='email-address'
-                                style={{ width: "100%" }}
-                                onChangeText={handleEmailChange}
-                                value={formData.emailAddress} // Corrigido de formData.responsibleEmailAdress para formData.emailAddress
-                                />
-                        </View>
+                    <View style={{
+                        width: '100%',
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingLeft: 22
+                    }}>
+                        {/* Use TextInputMask para aplicar a máscara de hora */}
+                        <TextInputMask
+                            type={'datetime'}
+                            options={{
+                                format: 'HH:mm'
+                            }}
+                            placeholder='Quais horarios?'
+                            placeholderTextColor={COLORS.black}
+                            style={{ width: '100%' }}
+                            onChangeText={handleEmailChange}
+                            value={formData.emailAddress}
+                        />
                     </View>
+                </View>
 
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Numero de emergencia</Text>
+                <View style={{ marginBottom: 12 }}>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Numero de emergencia</Text>
 
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            paddingLeft: 22
-                        }}>
-                            
-
-                            <TextInput
-                                placeholder='Numero de emergencia medica'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='defalut'
-                                style={{ width: "100%" }}
-                                onChangeText={handleMobileNumberChange}
-                                value={formData.mobileNumber} // Corrigido de formData.responsibleNumber para formData.mobileNumber
-                                />
-                        </View>
+                    <View style={{
+                        width: '100%',
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        flexDirection: 'row',
+                        justifyContent: 'space-between',
+                        paddingLeft: 22
+                    }}>
+                        {/* Use TextInputMask para aplicar a máscara de telefone */}
+                        <TextInputMask
+                            type={'cel-phone'}
+                            options={{
+                                maskType: 'BRL',
+                                withDDD: true,
+                                dddMask: '(99) '
+                            }}
+                            placeholder='Numero de emergencia medica'
+                            placeholderTextColor={COLORS.black}
+                            style={{ width: '100%' }}
+                            onChangeText={handleMobileNumberChange}
+                            value={formData.mobileNumber}
+                        />
                     </View>
+                </View>
 
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Numero Carteirinha convenio</Text>
+                <View style={{ marginBottom: 12 }}>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Numero Carteirinha convenio</Text>
 
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Coloque o numero da carteirinha'
-                                placeholderTextColor={COLORS.black}
-                                secureTextEntry={isPasswordShown}
-                                style={{ width: "100%" }}
-                                onChangeText={handleCPFChange}
-                                value={formData.cpf} // Corrigido de formData.responsiblecpf para formData.cpf
-                                />
+                    <View style={{
+                        width: '100%',
+                        height: 48,
+                        borderColor: COLORS.black,
+                        borderWidth: 1,
+                        borderRadius: 8,
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        paddingLeft: 22
+                    }}>
+                        {/* Use TextInputMask para aplicar a máscara de CNPJ */}
+                        <TextInputMask
+                            type={'cnpj'}
+                            placeholder='Coloque o numero da carteirinha'
+                            placeholderTextColor={COLORS.black}
+                            style={{ width: '100%' }}
+                            onChangeText={handleCPFChange}
+                            value={formData.cpf}
+                        />
 
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordShown(!isPasswordShown)}
-                                style={{
-                                    position: "absolute",
-                                    right: 12
-                                }}
-                            >
-                                {
-                                    isPasswordShown == true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.black} />
-                                    ) : (
-                                        <Ionicons name="eye" size={24} color={COLORS.black} />
-                                    )
-                                }
-
-                            </TouchableOpacity>
+                        <TouchableOpacity
+                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                            style={{
+                                position: 'absolute',
+                                right: 12
+                            }}
+                        >
+                            {isPasswordShown ? (
+                                <Ionicons name='eye-off' size={24} color={COLORS.black} />
+                            ) : (
+                                <Ionicons name='eye' size={24} color={COLORS.black} />
+                            )}
+                        </TouchableOpacity>
                         </View>
                     </View>
 
