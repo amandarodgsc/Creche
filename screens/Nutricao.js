@@ -259,7 +259,7 @@ Nutrição            </Text>
     }}
     placeholder="Digite os horários de alimentação"
     placeholderTextColor={COLORS.black}
-    keyboardType="default"
+    keyboardType="numeric"
     style={styles.input}
     onChangeText={(text) => handleFieldChange('horariosDeAlimentacao', text)}
     onFocus={() => handleFieldFocus('horariosDeAlimentacao')}
