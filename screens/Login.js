@@ -1,75 +1,95 @@
-import { View, Text, Pressable, TextInput, TouchableOpacity, ScrollView, scrollViewRef, Image } from 'react-native'
-import React, { useState } from 'react'
-import { SafeAreaView } from "react-native-safe-area-context";
-import COLORS from '../constants/colors';
-import { Ionicons } from "@expo/vector-icons";
-import Checkbox from "expo-checkbox"
+import React, { useState } from 'react';
+import { View, Text, TextInput, TouchableOpacity, ScrollView, Image, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
+import Checkbox from 'expo-checkbox';
 import Button from '../components/Button';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { IconButton } from 'react-native-paper';
-
+import COLORS from '../constants/colors';
+import { useFormik } from 'formik';
+import * as yup from 'yup';
+import { TextInputMask } from 'react-native-masked-text';
 
 const Signup = ({ navigation }) => {
     const [isPasswordShown, setIsPasswordShown] = useState(false);
     const [isChecked, setIsChecked] = useState(false);
-    const [formData, setFormData] = useState({
-        responsibleName: '',
-        responsibleAddress: '',
-        emailAddress: '',
-        mobileNumber: '',
-        cpf: ''
-    });
     const [submittedData, setSubmittedData] = useState([]);
     const [saveError, setSaveError] = useState(null);
     const [editIndex, setEditIndex] = useState(-1);
+    const [touchedFields, setTouchedFields] = useState({});
 
-    const handleNameChange = (text) => setFormData({ ...formData, responsibleName: text });
-    const handleAddressChange = (text) => setFormData({ ...formData, responsibleAddress: text });
-    const handleEmailChange = (text) => setFormData({ ...formData, emailAddress: text });
-    const handleMobileNumberChange = (text) => setFormData({ ...formData, mobileNumber: text });
-    const handleCPFChange = (text) => setFormData({ ...formData, cpf: text });
-    const validateEmail = (email) => {
-        // Expressão regular para validar o email
-        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailPattern.test(email);
+    const handleFieldFocus = (field) => {
+        setTouchedFields({ ...touchedFields, [field]: false });
     };
-    
+
+    const handleFieldBlur = (field) => {
+        setTouchedFields({ ...touchedFields, [field]: true });
+    };
+
+    const handleFieldChange = (field, text) => {
+        formik.handleChange(field)(text);
+    };
+
+    const validationSchema = yup.object().shape({
+        responsibleName: yup.string().required('Campo obrigatório'),
+        responsibleAddress: yup.string().required('Campo obrigatório'),
+        emailAddress: yup.string().email('Email inválido').required('Campo obrigatório'),
+        mobileNumber: yup.string().required('Campo obrigatório').min(11, 'Número de telefone inválido'),
+        cpf: yup.string().required('Campo obrigatório').min(12, 'CPF inválido'),
+    });
+
+
+    const formik = useFormik({
+        initialValues: {
+            responsibleName: '',
+            responsibleAddress: '',
+            emailAddress: '',
+            mobileNumber: '',
+            cpf: '',
+        },
+        validationSchema: validationSchema,
+        onSubmit: handleSignup,
+    });
 
     const handleSignup = async () => {
         try {
-            // Validação dos campos obrigatórios
+            // Limpar campos tocados
+            setTouchedFields({});
+
             if (
-                !formData.responsibleName ||
-                !formData.responsibleAddress ||
-                !formData.emailAddress ||
-                !formData.mobileNumber ||
-                !formData.cpf
+                !formik.values.responsibleName ||
+                !formik.values.responsibleAddress ||
+                !formik.values.emailAddress ||
+                !formik.values.mobileNumber ||
+                !formik.values.cpf
             ) {
                 throw new Error('Por favor, preencha todos os campos obrigatórios.');
             }
-    
+
             let newData = [...submittedData];
-            newData.push(formData);
+
+            // Verifica se está editando ou adicionando
+            if (editIndex !== -1) {
+                // Edição: substitui os dados existentes
+                newData[editIndex] = formik.values;
+            } else {
+                // Adição: adiciona um novo cadastro
+                newData.push(formik.values);
+            }
+
             setSubmittedData(newData);
             setSaveError(null);
             await AsyncStorage.setItem('user_data', JSON.stringify(newData));
-    
-            setFormData({
-                responsibleName: '',
-                responsibleAddress: '',
-                emailAddress: '',
-                mobileNumber: '',
-                cpf: ''
-            });
-    
-            // Navega para a próxima tela ou executa outra ação necessária
-            // navigation.navigate("Login");
+
+            // Reseta o formulário e o índice de edição
+            formik.resetForm();
+            setEditIndex(-1);
         } catch (error) {
-            console.error("Error saving data: ", error);
-            setSaveError(error.message || "Erro ao salvar os dados. Por favor, tente novamente.");
+            console.error('Error saving data: ', error);
+            setSaveError(error.message || 'Erro ao salvar os dados. Por favor, tente novamente.');
         }
     };
-
 
 
     const handleEdit = (index) => {
@@ -85,18 +105,19 @@ const Signup = ({ navigation }) => {
             setSaveError('Por favor, preencha todos os campos obrigatórios.');
             return;
         }
-        setFormData({
+
+        // Atualiza o estado do formulário com os dados existentes
+        formik.setValues({
             responsibleName: editedData.responsibleName || '',
             responsibleAddress: editedData.responsibleAddress || '',
             emailAddress: editedData.emailAddress || '',
             mobileNumber: editedData.mobileNumber || '',
             cpf: editedData.cpf || '',
         });
+
+        // Define o índice de edição para o índice atual
         setEditIndex(index);
     };
-
-
-
 
     const handleDelete = async (index) => {
         try {
@@ -104,37 +125,32 @@ const Signup = ({ navigation }) => {
             await AsyncStorage.setItem('user_data', JSON.stringify(newData));
             setSubmittedData(newData);
         } catch (error) {
-            console.error("Error deleting data: ", error);
+            console.error('Error deleting data: ', error);
         }
     };
-
-
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.white }}>
             <ScrollView
-                ref={scrollViewRef}
                 contentContainerStyle={{ flexGrow: 1 }}
                 keyboardShouldPersistTaps="handled"
             >
                 <View style={{ position: 'absolute', top: 10, left: 10 }}>
-        <Image
-          source={require("../assets/hero3.jpg")} // Substitua pelo caminho da sua primeira imagem
-          style={{
-            height: 100,
-            width: 100,
-            borderRadius: 20,
-            transform: [
-              { translateX: 285 },
-              { translateY: 0 },
-              { rotate: "1deg" }
-            ]
-          }}
-        />
-        {/* Adicione mais imagens seguindo o mesmo padrão... */}
-      </View>
-                
-                
+                    <Image
+                        source={require("../assets/hero3.jpg")}
+                        style={{
+                            height: 100,
+                            width: 100,
+                            borderRadius: 20,
+                            transform: [
+                                { translateX: 285 },
+                                { translateY: 0 },
+                                { rotate: "1deg" }
+                            ]
+                        }}
+                    />
+                </View>
+
                 <View style={{ flex: 1, marginHorizontal: 22 }}>
                     <View style={{ marginVertical: 22 }}>
                         <Text style={{
@@ -145,184 +161,128 @@ const Signup = ({ navigation }) => {
                         }}>
                             Cadastro da criança
                         </Text>
-
                         <Text style={{
                             fontSize: 16,
                             color: COLORS.black
                         }}>para mais segurança, e comunicação!</Text>
                     </View>
-                    
 
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Nome da criança</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Digite o nome da criança'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{ width: "100%" }}
-                                onChangeText={handleNameChange}
-                                value={formData.responsibleName}
-                            />
-
-                        </View>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Nome da criança:</Text>
+                    <View style={[styles.inputContainer, { borderColor: touchedFields.responsibleName ? (formik.values.responsibleName ? COLORS.grey : 'red') : COLORS.grey }]}>
+                        <TextInput
+                            placeholder="Digite o nome da criança"
+                            placeholderTextColor={COLORS.black}
+                            keyboardType="default"
+                            style={styles.input}
+                            onChangeText={(text) => handleFieldChange('responsibleName', text)}
+                            onFocus={() => handleFieldFocus('responsibleName')}
+                            onBlur={() => handleFieldBlur('responsibleName')}
+                            value={formik.values.responsibleName}
+                        />
+                        {touchedFields.responsibleName && formik.errors.responsibleName && (
+                            <Text style={{ color: 'red' }}>{formik.errors.responsibleName}</Text>
+                        )}
                     </View>
-
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Endereço da criança</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Digite o endereço da criança'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='default'
-                                style={{ width: "100%" }}
-                                onChangeText={handleAddressChange}
-                                value={formData.responsibleAddress}
-                            />
-
-                        </View>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Endereço:</Text>
+                    <View style={[styles.inputContainer, { borderColor: touchedFields.responsibleAddress ? (formik.values.responsibleAddress ? COLORS.grey : 'red') : COLORS.grey }]}>
+                        <TextInput
+                            placeholder="Digite o endereço da criança"
+                            placeholderTextColor={COLORS.black}
+                            keyboardType="default"
+                            style={styles.input}
+                            onChangeText={(text) => handleFieldChange('responsibleAddress', text)}
+                            onFocus={() => handleFieldFocus('responsibleAddress')}
+                            onBlur={() => handleFieldBlur('responsibleAddress')}
+                            value={formik.values.responsibleAddress}
+                        />
+                        {touchedFields.responsibleAddress && formik.errors.responsibleAddress && (
+                            <Text style={{ color: 'red' }}>{formik.errors.responsibleAddress}</Text>
+                        )}
                     </View>
-
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Nome da mãe</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Digite o Nome da mãe'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='email-address'
-                                style={{ width: "100%" }}
-                                onChangeText={handleEmailChange}
-                                value={formData.emailAddress} // Corrigido de formData.responsibleEmailAdress para formData.emailAddress
-                                />
-                        </View>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Email para contato:</Text>
+                    <View style={[styles.inputContainer, { borderColor: touchedFields.emailAddress ? (formik.values.emailAddress ? COLORS.grey : 'red') : COLORS.grey }]}>
+                        <TextInput
+                            placeholder="Digite Email para contato"
+                            placeholderTextColor={COLORS.black}
+                            keyboardType="email-address"
+                            style={styles.input}
+                            onChangeText={(text) => handleFieldChange('emailAddress', text)}
+                            onFocus={() => handleFieldFocus('emailAddress')}
+                            onBlur={() => handleFieldBlur('emailAddress')}
+                            value={formik.values.emailAddress}
+                        />
+                        {touchedFields.emailAddress && formik.errors.emailAddress && (
+                            <Text style={{ color: 'red' }}>{formik.errors.emailAddress}</Text>
+                        )}
                     </View>
-
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>Numero de Telefone do Responsavel</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            flexDirection: "row",
-                            justifyContent: "space-between",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='+61'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
-                                style={{
-                                    width: "12%",
-                                    borderRightWidth: 1,
-                                    borderLeftColor: COLORS.grey,
-                                    height: "100%"
-                                }}
-                            />
-
-                            <TextInput
-                                placeholder='Coloque o numero de telefone do responsavel'
-                                placeholderTextColor={COLORS.black}
-                                keyboardType='numeric'
-                                style={{ width: "100%" }}
-                                onChangeText={handleMobileNumberChange}
-                                value={formData.mobileNumber} // Corrigido de formData.responsibleNumber para formData.mobileNumber
-                                />
-                        </View>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>Numero de Telefone:</Text>
+                    <View style={[styles.inputContainer, { borderColor: touchedFields.mobileNumber ? (formik.values.mobileNumber ? COLORS.grey : 'red') : COLORS.grey }]}>
+                        <TextInputMask
+                            type={'cel-phone'}
+                            options={{
+                                maskType: 'BRL',
+                                withDDD: true,
+                                dddMask: '(99) ',
+                            }}
+                            placeholder="Coloque o numero de telefone do responsavel"
+                            placeholderTextColor={COLORS.black}
+                            keyboardType="numeric"
+                            style={[styles.input, { width: '88%' }]}
+                            onChangeText={(text) => handleFieldChange('mobileNumber', text)}
+                            onFocus={() => handleFieldFocus('mobileNumber')}
+                            onBlur={() => handleFieldBlur('mobileNumber')}
+                            value={formik.values.mobileNumber}
+                        />
+                        {touchedFields.mobileNumber && formik.errors.mobileNumber && (
+                            <Text style={{ color: 'red' }}>{formik.errors.mobileNumber}</Text>
+                        )}
                     </View>
-
-                    <View style={{ marginBottom: 12 }}>
-                        <Text style={{
-                            fontSize: 16,
-                            fontWeight: 400,
-                            marginVertical: 8
-                        }}>CPF da criança</Text>
-
-                        <View style={{
-                            width: "100%",
-                            height: 48,
-                            borderColor: COLORS.black,
-                            borderWidth: 1,
-                            borderRadius: 8,
-                            alignItems: "center",
-                            justifyContent: "center",
-                            paddingLeft: 22
-                        }}>
-                            <TextInput
-                                placeholder='Coloque o cpf da criança'
-                                placeholderTextColor={COLORS.black}
-                                secureTextEntry={isPasswordShown}
-                                style={{ width: "100%" }}
-                                onChangeText={handleCPFChange}
-                                value={formData.cpf} // Corrigido de formData.responsiblecpf para formData.cpf
-                                />
-
-                            <TouchableOpacity
-                                onPress={() => setIsPasswordShown(!isPasswordShown)}
-                                style={{
-                                    position: "absolute",
-                                    right: 12
-                                }}
-                            >
-                                {
-                                    isPasswordShown == true ? (
-                                        <Ionicons name="eye-off" size={24} color={COLORS.black} />
-                                    ) : (
-                                        <Ionicons name="eye" size={24} color={COLORS.black} />
-                                    )
-                                }
-
-                            </TouchableOpacity>
-                        </View>
+                    <Text style={{
+                        fontSize: 16,
+                        fontWeight: 400,
+                        marginVertical: 8
+                    }}>CPF da criança:</Text>
+                    <View style={[styles.inputContainer, { borderColor: touchedFields.cpf ? (formik.values.cpf ? COLORS.grey : 'red') : COLORS.grey }]}>
+                        <TextInputMask
+                            type={'cpf'}
+                            placeholder="Coloque o cpf da criança"
+                            placeholderTextColor={COLORS.black}
+                            secureTextEntry={isPasswordShown}
+                            style={styles.input}
+                            onChangeText={(text) => handleFieldChange('cpf', text)}
+                            onFocus={() => handleFieldFocus('cpf')}
+                            onBlur={() => handleFieldBlur('cpf')}
+                            value={formik.values.cpf}
+                        />
+                        <TouchableOpacity
+                            onPress={() => setIsPasswordShown(!isPasswordShown)}
+                            style={styles.eyeIconContainer}
+                        >
+                            {isPasswordShown == true ? (
+                                <Ionicons name="eye-off" size={24} color={COLORS.black} />
+                            ) : (
+                                <Ionicons name="eye" size={24} color={COLORS.black} />
+                            )}
+                        </TouchableOpacity>
+                        {touchedFields.cpf && formik.errors.cpf && (
+                            <Text style={{ color: 'red' }}>{formik.errors.cpf}</Text>
+                        )}
                     </View>
 
                     <View style={{
@@ -335,7 +295,6 @@ const Signup = ({ navigation }) => {
                             onValueChange={setIsChecked}
                             color={isChecked ? COLORS.primary : undefined}
                         />
-
                         <Text>Eu estou de acordo com as regras </Text>
                     </View>
 
@@ -375,9 +334,8 @@ const Signup = ({ navigation }) => {
                         />
                     </View>
 
-
                     {submittedData.map((data, index) => (
-                        <View key={index} style={{ marginTop: 20 }}>
+                        <View key={index} style={{ marginTop: 20, borderColor: touchedFields[index] ? 'white' : 'transparent', borderWidth: 1, padding: 10 }}>
                             <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
                                 Criança Cadastrada {index + 1}:
                             </Text>
@@ -389,17 +347,20 @@ const Signup = ({ navigation }) => {
                             <View style={{ flexDirection: 'row', marginTop: 10 }}>
                                 <View style={{ marginRight: 10 }}>
                                     <IconButton
-                                        icon="pencil" // Substitua pelo ícone de edição desejado
+                                        icon="pencil"
                                         color="white"
                                         size={20}
                                         style={{ backgroundColor: 'white', borderRadius: 5 }}
-                                        onPress={() => handleEdit(index)}
+                                        onPress={() => {
+                                            handleEdit(index);
+                                            setTouchedFields({ ...touchedFields, [index]: true });
+                                        }}
                                     />
                                     <Text style={{ textAlign: 'center', color: 'blue' }}>Editar</Text>
                                 </View>
                                 <View>
                                     <IconButton
-                                        icon="delete" // Substitua pelo ícone de deleção desejado
+                                        icon="delete"
                                         color="white"
                                         size={20}
                                         style={{ backgroundColor: 'red', borderRadius: 5 }}
@@ -410,31 +371,32 @@ const Signup = ({ navigation }) => {
                             </View>
                         </View>
                     ))}
-
-                    
-
-                    <View style={{
-                        flexDirection: 'row',
-                        justifyContent: 'center'
-                    }}>
-                    </View>
-
-                    <View style={{
-                        flexDirection: "row",
-                        justifyContent: "center",
-                        marginVertical: 22
-                    }}>
-
-
-
-
-                        
-                    </View>
                 </View>
             </ScrollView>
-
         </SafeAreaView>
-    )
+    );
 }
 
-export default Signup
+const styles = StyleSheet.create({
+    inputContainer: {
+        width: '100%',
+        height: 48,
+        borderWidth: 1,
+        borderColor: COLORS.grey,
+        borderRadius: 5,
+        paddingHorizontal: 16,
+        marginBottom: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    input: {
+        flex: 1,
+        height: '100%',
+        color: COLORS.black,
+    },
+    eyeIconContainer: {
+        marginLeft: 12,
+    },
+});
+
+export default Signup;
