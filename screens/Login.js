@@ -335,42 +335,42 @@ const Signup = ({ navigation }) => {
                     </View>
 
                     {submittedData.map((data, index) => (
-                        <View key={index} style={{ marginTop: 20, borderColor: touchedFields[index] ? 'white' : 'transparent', borderWidth: 1, padding: 10 }}>
-                            <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
-                                Criança Cadastrada {index + 1}:
-                            </Text>
-                            <Text>Nome: {data.responsibleName}</Text>
-                            <Text>Endereço: {data.responsibleAddress}</Text>
-                            <Text>Email: {data.emailAddress}</Text>
-                            <Text>Número de Telefone: {data.mobileNumber}</Text>
-                            <Text>CPF: {data.cpf}</Text>
-                            <View style={{ flexDirection: 'row', marginTop: 10 }}>
-                                <View style={{ marginRight: 10 }}>
-                                    <IconButton
-                                        icon="pencil"
-                                        color="white"
-                                        size={20}
-                                        style={{ backgroundColor: 'white', borderRadius: 5 }}
-                                        onPress={() => {
-                                            handleEdit(index);
-                                            setTouchedFields({ ...touchedFields, [index]: true });
-                                        }}
-                                    />
-                                    <Text style={{ textAlign: 'center', color: 'blue' }}>Editar</Text>
-                                </View>
-                                <View>
-                                    <IconButton
-                                        icon="delete"
-                                        color="white"
-                                        size={20}
-                                        style={{ backgroundColor: 'red', borderRadius: 5 }}
-                                        onPress={() => handleDelete(index)}
-                                    />
-                                    <Text style={{ textAlign: 'center', color: 'red' }}>Deletar</Text>
-                                </View>
-                            </View>
-                        </View>
-                    ))}
+    <View key={index} style={{ marginTop: 20, borderColor: touchedFields[index] ? 'white' : 'transparent', borderWidth: 1, padding: 10 }}>
+        <Text style={{ fontSize: 18, fontWeight: 'bold', marginBottom: 10 }}>
+            Criança Cadastrada {index + 1}:
+        </Text>
+        <Text>Nome: {data.responsibleName}</Text>
+        <Text>Endereço: {data.responsibleAddress}</Text>
+        <Text>Email: {data.emailAddress}</Text>
+        <Text>Número de Telefone: {data.mobileNumber}</Text>
+        <Text>CPF: {data.cpf}</Text>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+            <View style={{ marginRight: 10 }}>
+                <IconButton
+                    icon="pencil"
+                    color="white"
+                    size={20}
+                    style={{ backgroundColor: 'white', borderRadius: 5 }}
+                    onPress={() => {
+                        handleEdit(index);
+                        setTouchedFields({ ...touchedFields, [index]: true });
+                    }}
+                />
+                <Text style={{ textAlign: 'center', color: 'blue' }}>Editar</Text>
+            </View>
+            <View>
+                <IconButton
+                    icon="delete"
+                    color="white"
+                    size={20}
+                    style={{ backgroundColor: 'red', borderRadius: 5 }}
+                    onPress={() => handleDelete(index)}
+                />
+                <Text style={{ textAlign: 'center', color: 'red' }}>Deletar</Text>
+            </View>
+        </View>
+    </View>
+))}
                 </View>
             </ScrollView>
         </SafeAreaView>
